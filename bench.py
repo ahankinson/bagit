@@ -41,6 +41,25 @@ bagit.make_bag('bench-data', processes=%s)
 """
 
 # try 1-8 parallel processes
-for p in range(1, 9):
-    t = timeit.Timer(statement % p)
-    print "%s processes: %.2f seconds " % (p, (10 * t.timeit(number=10) / 10))
+# for p in range(1, 9):
+#     t = timeit.Timer(statement % p)
+#     print "%s processes: %.2f seconds " % (p, (10 * t.timeit(number=10) / 10))
+    
+
+pyb_statement = """
+import os
+from pybagit import bagit
+    
+if os.path.isdir('newbag'):
+    os.system("mv newbag/data/* bench-data/")
+    os.system("rm -r newbag")
+
+b = bagit.BagIt('newbag')
+b.set_hash_encoding('sha1')
+os.system("mv bench-data/* newbag/data/")
+
+b.update()
+b.validate()
+"""
+t = timeit.Timer(pyb_statement)
+print "pybagit took %.2f seconds" % (10 * t.timeit(number=10) / 10)
